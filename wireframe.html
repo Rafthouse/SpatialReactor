@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spatial Reactor — UX Wireframe</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #1a1a1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Courier New', monospace;
+  }
+
+  .panel {
+    width: 1200px;
+    height: 700px;
+    background: #fff;
+    border: 3px solid #000;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Grid helpers */
+  .grid {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+      linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  /* Typography */
+  .title {
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 8px;
+    color: #000;
+  }
+
+  .subtitle {
+    position: absolute;
+    top: 54px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: #666;
+    text-transform: uppercase;
+  }
+
+  /* Knob */
+  .knob {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .knob-circle {
+    width: 60px;
+    height: 60px;
+    border: 3px solid #000;
+    border-radius: 50%;
+    position: relative;
+    background: #fff;
+  }
+
+  .knob-circle::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 20px;
+    background: #000;
+    transform: translate(-50%, -100%) rotate(-45deg);
+    transform-origin: bottom center;
+    border-radius: 2px;
+  }
+
+  .knob-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #000;
+  }
+
+  .knob-value {
+    font-size: 10px;
+    color: #888;
+    margin-top: -6px;
+  }
+
+  /* Large center knob (Amount) */
+  .knob-large .knob-circle {
+    width: 100px;
+    height: 100px;
+    border-width: 4px;
+  }
+
+  .knob-large .knob-circle::after {
+    width: 5px;
+    height: 34px;
+  }
+
+  .knob-large .knob-label {
+    font-size: 14px;
+  }
+
+  /* Amount knob in center */
+  #amount-knob {
+    position: absolute;
+    top: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  /* Reactor Core (correlation visualization) */
+  #core {
+    position: absolute;
+    top: 258px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+  }
+
+  .core-ring {
+    width: 100px;
+    height: 100px;
+    border: 3px solid #000;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .core-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #000;
+  }
+
+  .core-labels {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 6px;
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: #999;
+    text-transform: uppercase;
+  }
+
+  /* Side knobs row */
+  #knobs-row {
+    position: absolute;
+    top: 428px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 120px;
+  }
+
+  /* Profile selector area */
+  #profile-area {
+    position: absolute;
+    top: 548px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .selector-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .selector-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #000;
+  }
+
+  .selector-box {
+    width: 200px;
+    height: 36px;
+    border: 3px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    background: #fff;
+  }
+
+  .selector-text {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .selector-arrow {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  /* Toggle */
+  .toggle-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .toggle-track {
+    width: 58px;
+    height: 26px;
+    border: 3px solid #000;
+    border-radius: 4px;
+    position: relative;
+    background: #fff;
+    cursor: pointer;
+  }
+
+  .toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 16px;
+    background: #000;
+    border-radius: 2px;
+  }
+
+  .toggle-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #000;
+  }
+
+  /* Safety indicator */
+  #safety-area {
+    position: absolute;
+    top: 636px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .safety-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  .safety-bar-bg {
+    width: 300px;
+    height: 12px;
+    border: 3px solid #000;
+    background: #fff;
+    position: relative;
+  }
+
+  .safety-bar-fill {
+    width: 60%;
+    height: 100%;
+    background: #000;
+  }
+
+  .safety-value {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #000;
+    min-width: 40px;
+  }
+
+  /* Profile indicator badge */
+  #profile-badge {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 2px solid #000;
+    padding: 4px 14px;
+    background: #fff;
+  }
+
+  .badge-label {
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #999;
+  }
+
+  .badge-value {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  /* Corner markers */
+  .corner { position: absolute; font-size: 8px; color: #ccc; letter-spacing: 1px; }
+  .corner-tl { top: 6px; left: 10px; }
+  .corner-tr { top: 6px; right: 10px; }
+  .corner-bl { bottom: 6px; left: 10px; }
+  .corner-br { bottom: 6px; right: 10px; }
+
+  /* Divider lines */
+  .divider-h {
+    position: absolute;
+    left: 40px; right: 40px;
+    height: 1px;
+    background: #ccc;
+  }
+  .divider-h1 { top: 80px; }
+  .divider-h2 { bottom: 54px; }
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="grid"></div>
+
+  <!-- Title -->
+  <div class="title">SPATIAL REACTOR</div>
+  <div class="subtitle">Spatial Width Processor</div>
+
+  <!-- Debug corners -->
+  <div class="corner corner-tl">UX WIREFRAME v1</div>
+  <div class="corner corner-tr">1200 × 700</div>
+  <div class="corner corner-bl">SHCHUR AUDIO</div>
+  <div class="corner corner-br">PSYCHOACOUSTIC</div>
+
+  <!-- Dividers -->
+  <div class="divider-h divider-h1"></div>
+  <div class="divider-h divider-h2"></div>
+
+  <!-- Profile badge -->
+  <div id="profile-badge">
+    <span class="badge-label">Profile</span>
+    <span class="badge-value">AUTO</span>
+  </div>
+
+  <!-- Amount knob (center) -->
+  <div id="amount-knob" class="knob knob-large">
+    <div class="knob-circle"></div>
+    <div class="knob-label">Amount</div>
+    <div class="knob-value">0%</div>
+  </div>
+
+  <!-- Reactor Core (correlation visualization) -->
+  <div id="core">
+    <div class="core-ring">
+      <div class="core-dot"></div>
+    </div>
+    <div class="core-labels">
+      <span>MONO</span>
+      <span>WIDE</span>
+      <span>HUGE</span>
+    </div>
+  </div>
+
+  <!-- Density, Texture, Air row -->
+  <div id="knobs-row">
+    <div class="knob">
+      <div class="knob-circle"></div>
+      <div class="knob-label">Density</div>
+      <div class="knob-value">50%</div>
+    </div>
+    <div class="knob">
+      <div class="knob-circle"></div>
+      <div class="knob-label">Texture</div>
+      <div class="knob-value">SILK</div>
+    </div>
+    <div class="knob">
+      <div class="knob-circle"></div>
+      <div class="knob-label">Air</div>
+      <div class="knob-value">0%</div>
+    </div>
+  </div>
+
+  <!-- Profile selector + Trust Mode -->
+  <div id="profile-area">
+    <div class="selector-group">
+      <span class="selector-label">Profile</span>
+      <div class="selector-box">
+        <span class="selector-text">Auto</span>
+        <span class="selector-arrow">▼</span>
+      </div>
+    </div>
+
+    <div class="toggle-group">
+      <span class="toggle-label">Trust</span>
+      <div class="toggle-track toggle-on">
+        <div class="toggle-thumb" style="left: 34px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Safety correlation meter -->
+  <div id="safety-area">
+    <span class="safety-label">SAFE</span>
+    <div class="safety-bar-bg">
+      <div class="safety-bar-fill"></div>
+    </div>
+    <span class="safety-value">60%</span>
+  </div>
+
+</div>
+</body>
+</html>

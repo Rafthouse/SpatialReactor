@@ -1,0 +1,42 @@
+# Build
+Build/
+build/
+*.vst3
+*.vst3/
+*.app/
+*.exe
+
+# IDE
+.vs/
+.vscode/
+*.suo
+*.user
+*.sdf
+*.filters
+*.opensdf
+*.cache
+ipch/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# JUCE
+JUCE/
+
+# Source assets (fonts too large for git)
+Source/assets/*.ttf
+Source/assets/*.svg
+
+# Temp
+*.log
+crashdumps/
+*.ps1
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spatial Reactor — Ukrainian Bauhaus Industrial</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Pirata+One&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #1a1c1f;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .panel {
+    width: 700px;
+    height: 960px;
+    background: #2C2E31;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  }
+
+  .grain {
+    position: absolute;
+    inset: 0;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+
+  .trim-top {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #8a8f96, #c4c8cc, #8a8f96);
+  }
+  .trim-bottom {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #8a8f96, #c4c8cc, #8a8f96);
+  }
+
+  /* ===== TOP BAR ===== */
+  .top-bar {
+    position: absolute;
+    top: 4px; left: 0; right: 0;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    border-bottom: 1px solid rgba(168,173,179,0.12);
+  }
+
+  .logo {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+  .logo svg { width: 100%; height: 100%; }
+
+  .top-brand {
+    margin-left: 16px;
+  }
+  .top-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 5px;
+    color: #E8E6E3;
+    text-transform: uppercase;
+  }
+  .top-sub {
+    font-size: 8px;
+    letter-spacing: 3.5px;
+    color: rgba(232,230,227,0.35);
+    text-transform: uppercase;
+    margin-top: 1px;
+  }
+
+  /* Profile buttons — top right */
+  .profile-group {
+    margin-left: auto;
+    display: flex;
+    border: 1px solid rgba(168,173,179,0.25);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .profile-btn {
+    padding: 7px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(232,230,227,0.45);
+    background: transparent;
+    border: none;
+    border-right: 1px solid rgba(168,173,179,0.12);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .profile-btn:last-child { border-right: none; }
+  .profile-btn:hover { color: #E8E6E3; background: rgba(45,107,255,0.06); }
+  .profile-btn.active {
+    color: #fff;
+    background: #2D6BFF;
+  }
+
+  /* === PROFILE BOTTOM === */
+  .profile-bottom {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+  }
+  .profile-bottom-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: rgba(232,230,227,0.25);
+  }
+  .profile-bottom-row {
+    display: flex;
+    border: 1px solid rgba(168,173,179,0.2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .pbtn {
+    padding: 8px 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: rgba(232,230,227,0.4);
+    background: transparent;
+    border: none;
+    border-right: 1px solid rgba(168,173,179,0.1);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .pbtn:last-child { border-right: none; }
+  .pbtn:hover { color: #E8E6E3; background: rgba(45,107,255,0.06); }
+  .pbtn.active { color: #fff; background: #2D6BFF; }
+
+  /* ===== CENTER COLUMN ===== */
+  .center-col {
+    position: absolute;
+    top: 74px;
+    left: 0; right: 0;
+    bottom: 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 40px 0;
+  }
+
+  /* === AMOUNT === */
+  .amount-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  .amount-knob {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: #2C2E31;
+    border: 3px solid #A8ADB3;
+    position: relative;
+    cursor: pointer;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .amount-knob::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 3px;
+    height: 38px;
+    background: #2D6BFF;
+    transform: translate(-50%, -100%) rotate(-45deg);
+    transform-origin: bottom center;
+    border-radius: 2px;
+  }
+  .amount-inner {
+    position: absolute;
+    top: 14px; left: 14px;
+    right: 14px; bottom: 14px;
+    border-radius: 50%;
+    border: 1px solid rgba(168,173,179,0.15);
+  }
+  .amount-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #E8E6E3;
+    margin-top: 12px;
+  }
+  .amount-value {
+    font-size: 12px;
+    font-weight: 300;
+    color: #2D6BFF;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  /* === REACTOR CORE === */
+  .core-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 28px;
+  }
+  .reactor-core {
+    width: 120px;
+    height: 120px;
+    position: relative;
+  }
+  .core-circle {
+    position: absolute;
+    border-radius: 50%;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .core-outline {
+    width: 120px; height: 120px;
+    border: 2px solid rgba(232,230,227,0.08);
+  }
+  .core-grid {
+    width: 102px; height: 102px;
+    border: 1px solid rgba(45,107,255,0.12);
+    background: repeating-conic-gradient(
+      rgba(45,107,255,0.03) 0% 20%,
+      transparent 20% 40%
+    );
+  }
+  .core-r1 { width: 80px; height: 80px; border: 2px solid rgba(45,107,255,0.2); }
+  .core-r2 { width: 56px; height: 56px; border: 1.5px solid rgba(45,107,255,0.3); }
+  .core-r3 { width: 32px; height: 32px; border: 2px solid rgba(45,107,255,0.45); }
+  .core-dot { width: 10px; height: 10px; background: #2D6BFF; border-radius: 50%; }
+
+  /* Constructivist rays */
+  .core-rays {
+    position: absolute;
+    width: 140px; height: 140px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .ray {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 1px;
+    height: 70px;
+    background: linear-gradient(to top, rgba(45,107,255,0.05), transparent);
+    transform-origin: bottom center;
+  }
+  .ray:nth-child(1) { transform: translate(-50%, -100%) rotate(0deg); }
+  .ray:nth-child(2) { transform: translate(-50%, -100%) rotate(30deg); }
+  .ray:nth-child(3) { transform: translate(-50%, -100%) rotate(60deg); }
+  .ray:nth-child(4) { transform: translate(-50%, -100%) rotate(90deg); }
+  .ray:nth-child(5) { transform: translate(-50%, -100%) rotate(120deg); }
+  .ray:nth-child(6) { transform: translate(-50%, -100%) rotate(150deg); }
+  .ray:nth-child(7) { transform: translate(-50%, -100%) rotate(180deg); }
+  .ray:nth-child(8) { transform: translate(-50%, -100%) rotate(210deg); }
+  .ray:nth-child(9) { transform: translate(-50%, -100%) rotate(240deg); }
+  .ray:nth-child(10) { transform: translate(-50%, -100%) rotate(270deg); }
+  .ray:nth-child(11) { transform: translate(-50%, -100%) rotate(300deg); }
+  .ray:nth-child(12) { transform: translate(-50%, -100%) rotate(330deg); }
+
+  .core-states {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 6px;
+  }
+  .core-state {
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(232,230,227,0.25);
+  }
+  .core-state.active { color: #2D6BFF; }
+
+  /* === 3 KNOBS ROW === */
+  .knobs-row {
+    display: flex;
+    gap: 80px;
+    align-items: flex-start;
+    margin-bottom: 24px;
+  }
+
+  .knob-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .knob-ring {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #2C2E31;
+    border: 2px solid #A8ADB3;
+    position: relative;
+    cursor: pointer;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+  }
+  .knob-ring::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 2px;
+    height: 22px;
+    background: #E8E6E3;
+    transform: translate(-50%, -100%) rotate(-30deg);
+    transform-origin: bottom center;
+    border-radius: 1px;
+  }
+  .knob-ring.texture { border-color: #2D6BFF; }
+  .knob-ring.texture::after { background: #2D6BFF; }
+
+  .knob-name {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #E8E6E3;
+  }
+  .knob-read {
+    font-size: 11px;
+    font-weight: 300;
+    color: rgba(232,230,227,0.45);
+    letter-spacing: 1px;
+  }
+  .knob-read.texture-val { color: #2D6BFF; font-weight: 600; }
+
+  /* === TEXTURE MODE BUTTONS === */
+  .texture-selector {
+    display: flex;
+    border: 1px solid rgba(168,173,179,0.2);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .tex-btn {
+    padding: 6px 22px;
+    font-family: 'Inter', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(232,230,227,0.4);
+    background: transparent;
+    border: none;
+    border-right: 1px solid rgba(168,173,179,0.1);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tex-btn:last-child { border-right: none; }
+  .tex-btn:hover { color: #E8E6E3; background: rgba(45,107,255,0.06); }
+  .tex-btn.active {
+    color: #fff;
+    background: #2D6BFF;
+  }
+
+  /* === SIGNATURE === */
+  .signature-area {
+    margin-top: auto;
+    text-align: center;
+    padding-bottom: 8px;
+  }
+  .signature-text {
+    font-family: 'Pirata One', serif;
+    font-size: 16px;
+    letter-spacing: 2px;
+    color: rgba(232,230,227,0.35);
+    text-shadow:
+      0 0 6px rgba(45,107,255,0.08),
+      0 0 12px rgba(45,107,255,0.04);
+  }
+
+  /* ===== BOTTOM BAR ===== */
+  .bottom-bar {
+    position: absolute;
+    bottom: 4px; left: 0; right: 0;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    border-top: 1px solid rgba(168,173,179,0.12);
+    gap: 32px;
+  }
+
+  .toggle-section {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .toggle-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: rgba(232,230,227,0.4);
+  }
+  .toggle-track {
+    width: 80px;
+    height: 34px;
+    border: 2px solid #A8ADB3;
+    border-radius: 3px;
+    position: relative;
+    background: #2C2E31;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .toggle-thumb {
+    position: absolute;
+    top: 0; left: 0;
+    width: 50%;
+    height: 100%;
+    background: #2D6BFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #fff;
+  }
+  .toggle-choices {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+  }
+  .toggle-choice {
+    flex: 1;
+    text-align: center;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: rgba(232,230,227,0.35);
+    z-index: 1;
+  }
+
+  .meter-section {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .meter-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(232,230,227,0.35);
+  }
+  .meter-track {
+    flex: 1;
+    height: 5px;
+    background: rgba(168,173,179,0.12);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+  .meter-fill {
+    height: 100%;
+    width: 68%;
+    background: linear-gradient(90deg, #2D6BFF, rgba(45,107,255,0.3));
+    border-radius: 2px;
+  }
+  .meter-value {
+    font-size: 11px;
+    font-weight: 600;
+    color: #2D6BFF;
+    letter-spacing: 1px;
+    min-width: 32px;
+  }
+
+  /* ===== SCREWS ===== */
+  .screw {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #5a5d62, #2C2E31);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+    border: 1px solid rgba(168,173,179,0.15);
+  }
+  .screw::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 7px; height: 1px;
+    background: rgba(168,173,179,0.25);
+    transform: translate(-50%, -50%) rotate(-45deg);
+  }
+  .screw-tl { top: 14px; left: 14px; }
+  .screw-tr { top: 14px; right: 14px; }
+  .screw-bl { bottom: 80px; left: 14px; }
+  .screw-br { bottom: 80px; right: 14px; }
+
+  /* Constructivist decor */
+  .geo {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.035;
+  }
+  .geo-v {
+    top: 74px; bottom: 72px; left: 24px;
+    width: 1px;
+    background: #2D6BFF;
+  }
+  .geo-h {
+    top: 50%; left: 24px; right: 24px;
+    height: 1px;
+    background: #2D6BFF;
+  }
+  .geo-sq {
+    width: 16px; height: 16px;
+    border: 2px solid #2D6BFF;
+    top: 86px; right: 24px;
+  }
+  .geo-ci {
+    width: 12px; height: 12px;
+    border: 2px solid #2D6BFF;
+    border-radius: 50%;
+    bottom: 82px; left: 180px;
+  }
+
+  .malevich {
+    position: absolute;
+    bottom: 78px;
+    right: 26px;
+    width: 32px;
+    height: 32px;
+    opacity: 0.06;
+  }
+  .malevich::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 16px; height: 16px;
+    background: #2D6BFF;
+  }
+  .malevich::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 11px; height: 11px;
+    background: #2D6BFF;
+  }
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="grain"></div>
+  <div class="trim-top"></div>
+  <div class="trim-bottom"></div>
+
+  <div class="screw screw-tl"></div>
+  <div class="screw screw-tr"></div>
+  <div class="screw screw-bl"></div>
+  <div class="screw screw-br"></div>
+
+  <div class="geo geo-v"></div>
+  <div class="geo geo-h"></div>
+  <div class="geo geo-sq"></div>
+  <div class="geo geo-ci"></div>
+  <div class="malevich"></div>
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="logo">
+      <svg viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="18" stroke="#2D6BFF" stroke-width="1.5" fill="none"/>
+        <circle cx="20" cy="20" r="13" stroke="#2D6BFF" stroke-width="1" fill="none" opacity="0.5"/>
+        <circle cx="20" cy="20" r="8" stroke="#2D6BFF" stroke-width="1" fill="none" opacity="0.3"/>
+        <circle cx="20" cy="20" r="2.5" fill="#2D6BFF"/>
+        <path d="M20 2 A18 18 0 0 1 37.5 12" stroke="#2C2E31" stroke-width="2.5" fill="none"/>
+      </svg>
+    </div>
+
+    <div class="top-brand">
+      <div class="top-title">Spatial Reactor</div>
+      <div class="top-sub">Psychoacoustic Width Processor</div>
+    </div>
+  </div>
+
+  <!-- CENTER COLUMN -->
+  <div class="center-col">
+
+    <div class="amount-section">
+      <div class="amount-knob">
+        <div class="amount-inner"></div>
+      </div>
+      <span class="amount-label">Amount</span>
+      <span class="amount-value">0%</span>
+    </div>
+
+    <div class="core-section">
+      <div class="reactor-core">
+        <div class="core-rays">
+          <div class="ray"></div><div class="ray"></div><div class="ray"></div>
+          <div class="ray"></div><div class="ray"></div><div class="ray"></div>
+          <div class="ray"></div><div class="ray"></div><div class="ray"></div>
+          <div class="ray"></div><div class="ray"></div><div class="ray"></div>
+        </div>
+        <div class="core-circle core-outline"></div>
+        <div class="core-circle core-grid"></div>
+        <div class="core-circle core-r1"></div>
+        <div class="core-circle core-r2"></div>
+        <div class="core-circle core-r3"></div>
+        <div class="core-circle core-dot"></div>
+      </div>
+      <div class="core-states">
+        <span class="core-state">Mono</span>
+        <span class="core-state active">Wide</span>
+        <span class="core-state">Huge</span>
+      </div>
+    </div>
+
+    <div class="knobs-row">
+      <div class="knob-unit">
+        <div class="knob-ring"></div>
+        <span class="knob-name">Density</span>
+        <span class="knob-read">50%</span>
+      </div>
+      <div class="knob-unit">
+        <div class="knob-ring texture"></div>
+        <span class="knob-name">Texture</span>
+        <span class="knob-read texture-val">Silk</span>
+      </div>
+      <div class="knob-unit">
+        <div class="knob-ring"></div>
+        <span class="knob-name">Air</span>
+        <span class="knob-read">0%</span>
+      </div>
+    </div>
+
+    <div class="texture-selector">
+      <button class="tex-btn active">Silk</button>
+      <button class="tex-btn">Dust</button>
+      <button class="tex-btn">Rust</button>
+    </div>
+
+    <div class="signature-area">
+      <span class="signature-text">By Mykyta Shchur</span>
+    </div>
+
+    <!-- PROFILE BOTTOM -->
+    <div class="profile-bottom">
+      <span class="profile-bottom-label">Source Profile</span>
+      <div class="profile-bottom-row">
+        <button class="pbtn active">Auto</button>
+        <button class="pbtn">Vocal</button>
+        <button class="pbtn">Inst</button>
+        <button class="pbtn">Master</button>
+        <button class="pbtn">Ambient</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM BAR -->
+  <div class="bottom-bar">
+    <div class="toggle-section">
+      <span class="toggle-label">Mode</span>
+      <div class="toggle-track">
+        <div class="toggle-thumb">Safe</div>
+        <div class="toggle-choices">
+          <span class="toggle-choice"></span>
+          <span class="toggle-choice">Free</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="meter-section">
+      <span class="meter-label">Correlation</span>
+      <div class="meter-track">
+        <div class="meter-fill"></div>
+      </div>
+      <span class="meter-value">0.68</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
