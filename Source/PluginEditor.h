@@ -94,5 +94,8 @@ private:
     // HWND is only available after resized() is called.
     bool fontsInitialized = false;
 
+    // Flag to prevent resized() from running before constructor completes
+    bool constructorDone = false;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpatialReactorAudioProcessorEditor)
 };

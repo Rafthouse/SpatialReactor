@@ -70,8 +70,6 @@ SpatialReactorAudioProcessorEditor::SpatialReactorAudioProcessorEditor (SpatialR
 
  setLookAndFeel (&bauhausLF);
  juce::Logger::writeToLog("1a. setLookAndFeel OK");
- setSize (700, 960);
- juce::Logger::writeToLog("1b. setSize OK");
 
  // --- Етап 1: Створення ручок ---
  juce::Logger::writeToLog("2. Editor ctor: Creating amountKnob");
@@ -134,7 +132,12 @@ SpatialReactorAudioProcessorEditor::SpatialReactorAudioProcessorEditor (SpatialR
 
  juce::Logger::writeToLog("13. Editor ctor: attachments - END");
 
+ // --- Етап 5: setSize в самому кінці (після створення всіх віджетів) ---
+ setSize (700, 960);
+ juce::Logger::writeToLog("13b. setSize OK (after all widgets)");
+
  // --- ФІНАЛЬНИЙ ЛОГ ---
+ constructorDone = true;
  juce::Logger::writeToLog("14. Editor ctor: END");
 }
 
@@ -238,6 +241,10 @@ void SpatialReactorAudioProcessorEditor::resized()
 {
     // Fonts are initialized on first paint() to avoid VST3 re-entrant crash
     juce::Logger::writeToLog("resized: called");
+
+    if (!constructorDone)
+        return;
+
 
     auto bounds = getLocalBounds();
     bounds.reduce (40, 0);

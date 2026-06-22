@@ -1,0 +1,72 @@
+name: Build Spatial Reactor
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install JUCE
+        run: |
+          git clone --depth 1 --branch 8.0.13 https://github.com/juce-framework/JUCE.git ../JUCE
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -G "Visual Studio 17 2022" -A x64
+
+      - name: Build VST3
+        run: |
+          cmake --build build --config Release --target SpatialReactor_VST3
+
+      - name: Upload VST3 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SpatialReactor-Windows-VST3
+          path: |
+            build/SpatialReactor_artefacts/Release/VST3/Spatial Reactor.vst3
+          if-no-files-found: error
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install JUCE
+        run: |
+          git clone --depth 1 --branch 8.0.13 https://github.com/juce-framework/JUCE.git ../JUCE
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -G Xcode
+
+      - name: Build VST3 + AU
+        run: |
+          cmake --build build --config Release --target SpatialReactor_VST3
+          cmake --build build --config Release --target SpatialReactor_AU
+
+      - name: Upload VST3 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SpatialReactor-macOS-VST3
+          path: |
+            build/SpatialReactor_artefacts/Release/VST3/Spatial Reactor.vst3
+          if-no-files-found: error
+
+      - name: Upload AU artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SpatialReactor-macOS-AU
+          path: |
+            build/SpatialReactor_artefacts/Release/AU/Spatial Reactor.component
+          if-no-files-found: error
