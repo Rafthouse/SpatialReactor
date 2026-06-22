@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spatial Reactor — Ukrainian Bauhaus Industrial v6</title>
+<style>
+  :root {
+    --bg: #17191c;
+    --panel: #2c2e31;
+    --panel-2: #242629;
+    --aluminium: #a8adb3;
+    --aluminium-dim: #666b71;
+    --ink: #e8e6e3;
+    --muted: #95999f;
+    --accent: #2d6bff;
+    --accent-soft: rgba(45,107,255,.18);
+    --line: rgba(168,173,179,.32);
+    --deep: #101114;
+    --danger: #d85a49;
+    --shadow: rgba(0,0,0,.42);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(circle at 50% 45%, #2a2d31 0%, #17191c 48%, #0e0f11 100%);
+    color: var(--ink);
+    font-family: Inter, "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+    overflow: auto;
+  }
+
+  .shell {
+    width: 900px;
+    height: 560px;
+    position: relative;
+    overflow: hidden;
+    background:
+      linear-gradient(115deg, rgba(255,255,255,.025), transparent 26%),
+      var(--panel);
+    border: 1px solid #111316;
+    box-shadow: 0 24px 60px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.035);
+    border-radius: 8px;
+    user-select: none;
+  }
+
+  .shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: .22;
+    mix-blend-mode: soft-light;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,.018) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, rgba(0,0,0,.018) 0 1px, transparent 1px 4px);
+  }
+
+  .frame-line {
+    position: absolute;
+    inset: 13px;
+    border: 1px solid rgba(168,173,179,.20);
+    pointer-events: none;
+  }
+
+  .corner-code {
+    position: absolute;
+    width: 76px;
+    height: 24px;
+    overflow: hidden;
+    opacity: .7;
+  }
+  .corner-code::before,
+  .corner-code::after {
+    content: "";
+    position: absolute;
+    height: 3px;
+    background: var(--accent);
+    transform: rotate(-24deg);
+    transform-origin: left center;
+  }
+  .corner-code::before { width: 64px; left: 2px; top: 16px; }
+  .corner-code::after { width: 28px; left: 42px; top: 6px; }
+  .corner-code.tl { top: 13px; left: 12px; }
+  .corner-code.br { right: 12px; bottom: 13px; transform: rotate(180deg); }
+
+  header {
+    height: 76px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 22px;
+    padding: 15px 30px 13px 30px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    z-index: 2;
+  }
+
+  .brand {
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    gap: 12px;
+    align-items: center;
+  }
+  .logo {
+    width: 30px;
+    height: 30px;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    position: relative;
+  }
+  .logo::before {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    border-right-color: transparent;
+    transform: rotate(-38deg);
+  }
+  .logo::after {
+    content: "";
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--ink);
+    left: 11px;
+    top: 11px;
+  }
+
+  .title {
+    font-size: 20px;
+    letter-spacing: .22em;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .subtitle {
+    margin-top: 7px;
+    font-size: 8px;
+    letter-spacing: .31em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .profile-wrap { text-align: right; }
+  .mini-label {
+    font-size: 8px;
+    letter-spacing: .26em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+  .segmented {
+    display: flex;
+    height: 28px;
+    border: 1px solid var(--line);
+    background: rgba(0,0,0,.14);
+  }
+  .segmented button {
+    min-width: 58px;
+    border: 0;
+    border-right: 1px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    font: 600 8px/1 Inter, "Segoe UI", sans-serif;
+    letter-spacing: .12em;
+    cursor: pointer;
+    padding: 0 9px;
+  }
+  .segmented button:last-child { border-right: 0; }
+  .segmented button.active {
+    color: var(--ink);
+    background: var(--accent-soft);
+    box-shadow: inset 0 -2px 0 var(--accent);
+  }
+
+  main {
+    height: 408px;
+    display: grid;
+    grid-template-columns: 1.17fr .83fr;
+    gap: 18px;
+    padding: 18px 28px 16px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .module {
+    border: 1px solid var(--line);
+    background: rgba(10,11,13,.18);
+    position: relative;
+  }
+  .module-title {
+    position: absolute;
+    left: 14px;
+    top: 10px;
+    font-size: 8px;
+    letter-spacing: .24em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .module-index {
+    position: absolute;
+    right: 14px;
+    top: 10px;
+    font-size: 8px;
+    letter-spacing: .16em;
+    color: var(--aluminium-dim);
+  }
+
+  .reactor-panel {
+    display: grid;
+    grid-template-columns: 1fr 132px;
+    gap: 10px;
+    padding: 38px 20px 18px 20px;
+    min-height: 100%;
+  }
+
+  .core-zone {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-width: 0;
+  }
+
+  .core {
+    --spread: .45;
+    --glow: .45;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    position: relative;
+    display: grid;
+    place-items: center;
+    isolation: isolate;
+  }
+  .core::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: 50%;
+    background:
+      repeating-conic-gradient(from -3deg, rgba(168,173,179,.42) 0deg 1deg, transparent 1deg 15deg);
+    mask: radial-gradient(circle, transparent 0 76%, #000 76.4% 78%, transparent 78.5%);
+    opacity: .55;
+    pointer-events: none;
+  }
+  .core::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 170px;
+    height: 170px;
+    z-index: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    background: radial-gradient(circle,
+      rgba(45,107,255,.28) 0%,
+      rgba(45,107,255,.12) 38%,
+      rgba(45,107,255,.04) 56%,
+      transparent 74%);
+    filter: blur(14px);
+    opacity: calc(var(--glow) * .52);
+    transform: translate(-50%, -50%) scale(calc(.76 + var(--spread) * .38));
+    transition: opacity .18s ease, transform .18s ease;
+  }
+  .ring {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 2;
+    border: 1px solid var(--aluminium-dim);
+    border-radius: 50%;
+    transform-origin: 50% 50%;
+    transition: transform .18s ease, border-color .18s ease, opacity .18s ease, box-shadow .18s ease;
+    box-shadow: 0 0 calc(var(--glow) * 10px) rgba(45,107,255,.16);
+  }
+  .ring.r1 { width: 212px; height: 212px; opacity: .48; transform: translate(-50%, -50%) scale(calc(.76 + var(--spread) * .20)); }
+  .ring.r2 { width: 170px; height: 170px; opacity: .64; transform: translate(-50%, -50%) scale(calc(.74 + var(--spread) * .30)); border-color: rgba(45,107,255,.75); }
+  .ring.r3 { width: 126px; height: 126px; opacity: .9; transform: translate(-50%, -50%) scale(calc(.72 + var(--spread) * .42)); }
+  .ring.r4 { width: 80px; height: 80px; opacity: .95; transform: translate(-50%, -50%) scale(calc(.72 + var(--spread) * .50)); border-color: var(--accent); }
+
+  .axis-x, .axis-y {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    background: rgba(168,173,179,.18);
+    pointer-events: none;
+  }
+  .axis-x { width: 238px; height: 1px; transform: translate(-50%, -50%); }
+  .axis-y { height: 238px; width: 1px; transform: translate(-50%, -50%); }
+
+  .core-mark {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 2;
+    width: 224px;
+    height: 224px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background:
+      conic-gradient(from 17deg,
+        transparent 0 12deg,
+        rgba(45,107,255,.42) 12deg 13.8deg,
+        transparent 13.8deg 88deg,
+        rgba(232,230,227,.19) 88deg 89.2deg,
+        transparent 89.2deg 180deg,
+        rgba(45,107,255,.34) 180deg 181.5deg,
+        transparent 181.5deg 271deg,
+        rgba(232,230,227,.16) 271deg 272deg,
+        transparent 272deg 360deg);
+    mask: radial-gradient(circle, transparent 0 68%, #000 68.5% 69.5%, transparent 70%);
+  }
+
+  .amount-block {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+  }
+  .amount-block .knob {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: auto;
+  }
+  .amount-block .control-label,
+  .amount-block .control-value {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+  .amount-block .control-label { top: calc(50% + 48px); }
+  .amount-block .control-value { top: calc(50% + 62px); }
+
+  .knob {
+    --angle: 0deg;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    position: relative;
+    cursor: ns-resize;
+    background: #17191c;
+    border: 1px solid #73787e;
+    box-shadow: 0 9px 20px rgba(0,0,0,.38), inset 0 0 0 7px #222529, inset 0 0 0 8px rgba(255,255,255,.04);
+  }
+  .knob.large { width: 92px; height: 92px; }
+  .knob::before {
+    content: "";
+    position: absolute;
+    width: 2px;
+    height: 33%;
+    left: calc(50% - 1px);
+    top: 10%;
+    transform-origin: 50% 122%;
+    transform: rotate(var(--angle));
+    background: linear-gradient(to bottom, var(--accent) 0 55%, var(--ink) 55% 100%);
+    box-shadow: 0 0 8px rgba(45,107,255,.22);
+  }
+  .knob::after {
+    content: "";
+    position: absolute;
+    inset: -7px;
+    border-radius: 50%;
+    background: repeating-conic-gradient(from -132deg, rgba(168,173,179,.68) 0 1deg, transparent 1deg 9deg);
+    mask: radial-gradient(circle, transparent 0 82%, #000 82.5% 84%, transparent 84.5%);
+    opacity: .72;
+  }
+
+  .control-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+  }
+  .control-value {
+    font: 500 10px/1 "IBM Plex Mono", Consolas, monospace;
+    color: var(--accent);
+    letter-spacing: .08em;
+  }
+
+  .width-scale {
+    position: absolute;
+    bottom: 1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 254px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    color: var(--muted);
+    font-size: 7px;
+    letter-spacing: .18em;
+  }
+  .width-scale span:nth-child(2) { text-align: center; color: var(--ink); }
+  .width-scale span:nth-child(3) { text-align: right; }
+  .width-scale::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: -7px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--aluminium-dim), var(--accent), var(--aluminium-dim));
+  }
+
+  .readout-strip {
+    border-left: 1px solid var(--line);
+    padding-left: 14px;
+    display: grid;
+    align-content: center;
+    gap: 15px;
+  }
+  .readout-row {
+    display: grid;
+    gap: 4px;
+  }
+  .readout-row .key {
+    font-size: 7px;
+    letter-spacing: .18em;
+    color: var(--muted);
+  }
+  .readout-row .val {
+    font: 600 13px/1 "IBM Plex Mono", Consolas, monospace;
+    color: var(--ink);
+  }
+  .readout-row .val.blue { color: var(--accent); }
+  .mini-bars {
+    height: 30px;
+    display: flex;
+    align-items: end;
+    gap: 3px;
+  }
+  .mini-bars i {
+    display: block;
+    width: 5px;
+    height: var(--h);
+    background: var(--aluminium-dim);
+  }
+  .mini-bars i.on { background: var(--accent); }
+
+  .controls-panel {
+    padding: 38px 16px 14px;
+    display: grid;
+    grid-template-rows: 156px 58px 1fr;
+    gap: 12px;
+  }
+  .knob-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    align-items: start;
+  }
+  .knob-unit {
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    gap: 7px;
+    min-width: 0;
+  }
+  .knob-unit .knob { width: 66px; height: 66px; }
+  .knob-unit .control-label { font-size: 8px; letter-spacing: .16em; }
+  .knob-unit .control-value { font-size: 9px; }
+
+  .texture-modes {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: stretch;
+  }
+  .texture-modes button {
+    border: 0;
+    border-right: 1px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    font: 700 8px/1 Inter, sans-serif;
+    letter-spacing: .17em;
+    cursor: pointer;
+  }
+  .texture-modes button:last-child { border-right: 0; }
+  .texture-modes button.active {
+    color: var(--ink);
+    background: var(--accent-soft);
+    box-shadow: inset 0 -2px 0 var(--accent);
+  }
+
+  .trust-zone {
+    display: grid;
+    grid-template-columns: 1fr 128px;
+    gap: 14px;
+    align-items: center;
+  }
+  .trust-copy h3 {
+    font-size: 9px;
+    letter-spacing: .21em;
+    margin: 0 0 8px;
+  }
+  .trust-copy p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 7px;
+    line-height: 1.7;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  .trust-toggle {
+    height: 50px;
+    border: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: #17191c;
+    cursor: pointer;
+    position: relative;
+  }
+  .trust-toggle span {
+    display: grid;
+    place-items: center;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: .16em;
+    color: var(--muted);
+    z-index: 2;
+  }
+  .trust-toggle::before {
+    content: "";
+    position: absolute;
+    width: 50%;
+    inset-block: 0;
+    left: 0;
+    background: var(--accent-soft);
+    border-bottom: 2px solid var(--accent);
+    transition: left .16s ease;
+  }
+  .trust-toggle.free::before { left: 50%; }
+  .trust-toggle:not(.free) span:first-child,
+  .trust-toggle.free span:last-child { color: var(--ink); }
+
+  footer {
+    height: 76px;
+    border-top: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 118px 1fr 130px;
+    gap: 15px;
+    align-items: center;
+    padding: 12px 28px 13px;
+    position: relative;
+    z-index: 2;
+  }
+  .corr-copy .big {
+    font: 700 17px/1 "IBM Plex Mono", Consolas, monospace;
+    color: var(--ink);
+  }
+  .corr-copy .small {
+    margin-top: 6px;
+    font-size: 7px;
+    letter-spacing: .18em;
+    color: var(--muted);
+  }
+  .corr-meter {
+    display: grid;
+    grid-template-columns: repeat(32, 1fr);
+    gap: 3px;
+    height: 28px;
+    align-items: stretch;
+  }
+  .corr-meter i {
+    background: #17191c;
+    border: 1px solid rgba(168,173,179,.18);
+    transition: background .12s ease, border-color .12s ease;
+  }
+  .corr-meter i.on {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .corr-meter i.warn.on {
+    background: var(--danger);
+    border-color: var(--danger);
+  }
+  .signature {
+    text-align: right;
+  }
+  .signature strong {
+    font-size: 9px;
+    letter-spacing: .16em;
+  }
+  .signature div {
+    margin-top: 7px;
+    color: var(--muted);
+    font-size: 7px;
+    letter-spacing: .22em;
+  }
+
+  .screw {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: 1px solid rgba(168,173,179,.42);
+    background: #1b1d20;
+    z-index: 5;
+  }
+  .screw::after {
+    content: "";
+    position: absolute;
+    width: 5px;
+    height: 1px;
+    background: rgba(168,173,179,.52);
+    left: 1px;
+    top: 3px;
+    transform: rotate(-27deg);
+  }
+  .s1 { left: 18px; top: 18px; }
+  .s2 { right: 18px; top: 18px; }
+  .s3 { left: 18px; bottom: 18px; }
+  .s4 { right: 18px; bottom: 18px; }
+
+  @media (max-width: 940px), (max-height: 600px) {
+    .shell { transform: scale(.85); transform-origin: center; }
+  }
+  @media (max-width: 790px), (max-height: 500px) {
+    .shell { transform: scale(.70); }
+  }
+</style>
+</head>
+<body>
+  <section class="shell" aria-label="Spatial Reactor plugin mockup">
+    <div class="frame-line"></div>
+    <div class="corner-code tl"></div>
+    <div class="corner-code br"></div>
+    <i class="screw s1"></i><i class="screw s2"></i><i class="screw s3"></i><i class="screw s4"></i>
+
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div class="title">SPATIAL REACTOR</div>
+          <div class="subtitle">Psychoacoustic width processor / Kyiv laboratory series</div>
+        </div>
+      </div>
+      <div class="profile-wrap">
+        <div class="mini-label">Source profile</div>
+        <div class="segmented" data-group="profile">
+          <button class="active">AUTO</button><button>VOCAL</button><button>INST</button><button>MASTER</button><button>AMBIENT</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="module reactor-panel">
+        <div class="module-title">Reactor core / stereo field</div>
+        <div class="module-index">SR–01</div>
+
+        <div class="core-zone">
+          <div class="core" id="core">
+            <div class="axis-x"></div><div class="axis-y"></div><div class="core-mark"></div>
+            <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div><div class="ring r4"></div>
+            <div class="amount-block">
+              <div class="knob large" data-name="AMOUNT" data-min="0" data-max="100" data-value="58"></div>
+              <div class="control-label">Amount</div>
+              <div class="control-value">58%</div>
+            </div>
+            <div class="width-scale"><span>MONO</span><span>WIDE</span><span>HUGE</span></div>
+          </div>
+        </div>
+
+        <aside class="readout-strip">
+          <div class="readout-row"><span class="key">WIDTH</span><span class="val blue" id="widthReadout">1.58×</span></div>
+          <div class="readout-row"><span class="key">PROFILE</span><span class="val" id="profileReadout">AUTO</span></div>
+          <div class="readout-row"><span class="key">MODE</span><span class="val" id="modeReadout">SILK</span></div>
+          <div class="readout-row">
+            <span class="key">FIELD</span>
+            <div class="mini-bars" id="miniBars">
+              <i style="--h:8px"></i><i style="--h:15px"></i><i style="--h:24px"></i><i style="--h:30px"></i><i style="--h:22px"></i><i style="--h:12px"></i><i style="--h:7px"></i>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="module controls-panel">
+        <div class="module-title">Spatial shaping</div>
+        <div class="module-index">DSP–A</div>
+
+        <div class="knob-row">
+          <div class="knob-unit">
+            <div class="knob" data-name="DENSITY" data-min="0" data-max="100" data-value="46"></div>
+            <div class="control-label">Density</div>
+            <div class="control-value">46%</div>
+          </div>
+          <div class="knob-unit">
+            <div class="knob" data-name="TEXTURE" data-min="0" data-max="100" data-value="32"></div>
+            <div class="control-label">Texture</div>
+            <div class="control-value">32%</div>
+          </div>
+          <div class="knob-unit">
+            <div class="knob" data-name="AIR" data-min="0" data-max="100" data-value="24"></div>
+            <div class="control-label">Air</div>
+            <div class="control-value">24%</div>
+          </div>
+        </div>
+
+        <div class="texture-modes" data-group="texture">
+          <button class="active">SILK</button><button>DUST</button><button>RUST</button>
+        </div>
+
+        <div class="trust-zone">
+          <div class="trust-copy">
+            <h3>TRUST GOVERNOR</h3>
+            <p>Safe constrains correlation and protects the centre. Free removes the governor.</p>
+          </div>
+          <div class="trust-toggle" id="trustToggle" role="switch" aria-checked="true" tabindex="0">
+            <span>SAFE</span><span>FREE</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="corr-copy">
+        <div class="big" id="corrValue">+0.68</div>
+        <div class="small">CORRELATION</div>
+      </div>
+      <div class="corr-meter" id="corrMeter" aria-label="Correlation meter"></div>
+      <div class="signature"><strong>MYKYTA SHCHUR</strong><div>KYIV / 2026</div></div>
+    </footer>
+  </section>
+
+<script>
+(() => {
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const knobs = [...document.querySelectorAll('.knob')];
+  const core = document.getElementById('core');
+  const corrMeter = document.getElementById('corrMeter');
+  const corrValue = document.getElementById('corrValue');
+  const widthReadout = document.getElementById('widthReadout');
+  const miniBars = [...document.querySelectorAll('#miniBars i')];
+
+  for (let i = 0; i < 32; i++) {
+    const seg = document.createElement('i');
+    if (i < 5) seg.classList.add('warn');
+    corrMeter.appendChild(seg);
+  }
+
+  function refreshKnob(knob) {
+    const min = +knob.dataset.min;
+    const max = +knob.dataset.max;
+    const value = +knob.dataset.value;
+    const t = (value - min) / (max - min);
+    const angle = -132 + t * 264;
+    knob.style.setProperty('--angle', angle + 'deg');
+    const valueNode = knob.parentElement.querySelector('.control-value');
+    if (valueNode) valueNode.textContent = Math.round(value) + '%';
+
+    if (knob.dataset.name === 'AMOUNT') {
+      core.style.setProperty('--spread', t.toFixed(3));
+      core.style.setProperty('--glow', t.toFixed(3));
+      widthReadout.textContent = (1 + t).toFixed(2) + '×';
+      const corr = clamp(.93 - t * .43, -.2, .99);
+      corrValue.textContent = (corr >= 0 ? '+' : '') + corr.toFixed(2);
+      const active = Math.round((corr + 1) / 2 * 32);
+      [...corrMeter.children].forEach((seg, i) => seg.classList.toggle('on', i < active));
+      miniBars.forEach((bar, i) => bar.classList.toggle('on', i <= Math.round(t * 6)));
+    }
+  }
+
+  knobs.forEach(knob => {
+    refreshKnob(knob);
+    let startY = 0, startValue = 0, dragging = false;
+    const set = v => {
+      knob.dataset.value = clamp(v, +knob.dataset.min, +knob.dataset.max);
+      refreshKnob(knob);
+    };
+    knob.addEventListener('pointerdown', e => {
+      dragging = true;
+      startY = e.clientY;
+      startValue = +knob.dataset.value;
+      knob.setPointerCapture(e.pointerId);
+    });
+    knob.addEventListener('pointermove', e => {
+      if (!dragging) return;
+      set(startValue + (startY - e.clientY) * .55);
+    });
+    knob.addEventListener('pointerup', () => dragging = false);
+    knob.addEventListener('wheel', e => {
+      e.preventDefault();
+      set(+knob.dataset.value + (e.deltaY < 0 ? 2 : -2));
+    }, { passive: false });
+    knob.addEventListener('dblclick', () => set(knob.dataset.name === 'AMOUNT' ? 50 : knob.dataset.name === 'DENSITY' ? 50 : 0));
+  });
+
+  document.querySelectorAll('[data-group]').forEach(group => {
+    group.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+        btn.classList.add('active');
+        if (group.dataset.group === 'profile') document.getElementById('profileReadout').textContent = btn.textContent;
+        if (group.dataset.group === 'texture') document.getElementById('modeReadout').textContent = btn.textContent;
+      });
+    });
+  });
+
+  const toggle = document.getElementById('trustToggle');
+  function flipTrust() {
+    toggle.classList.toggle('free');
+    toggle.setAttribute('aria-checked', String(!toggle.classList.contains('free')));
+  }
+  toggle.addEventListener('click', flipTrust);
+  toggle.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipTrust(); } });
+})();
+</script>
+</body>
+</html>

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_dsp/juce_dsp.h>
 #include "dsp/MSMatrix.h"
@@ -57,6 +58,7 @@ public:
 
     // Expose DSP state for the editor
     int getCurrentProfile() const noexcept { return currentProfile; }
+    std::atomic<float> correlationValue { 0.68f };
 
 private:
     // DSP blocks

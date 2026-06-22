@@ -8,12 +8,14 @@ SpatialReactorAudioProcessor::SpatialReactorAudioProcessor()
                                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
       apvts (*this, nullptr, "PARAMETERS",
       {
-          std::make_unique<juce::AudioParameterFloat> ("amount",    "Amount",    0.0f, 1.0f, 0.0f),
-          std::make_unique<juce::AudioParameterFloat> ("density",   "Density",   0.0f, 1.0f, 0.5f),
-          std::make_unique<juce::AudioParameterFloat> ("texture",   "Texture",   0.0f, 1.0f, 0.0f),
-          std::make_unique<juce::AudioParameterFloat> ("air",       "Air",       0.0f, 1.0f, 0.0f),
-          std::make_unique<juce::AudioParameterBool>  ("trustMode", "Trust Mode", true),
-          std::make_unique<juce::AudioParameterChoice>("profile",   "Profile",
+          std::make_unique<juce::AudioParameterFloat> ("amount",      "Amount",      0.0f, 1.0f, 0.0f),
+          std::make_unique<juce::AudioParameterFloat> ("density",     "Density",     0.0f, 1.0f, 0.5f),
+          std::make_unique<juce::AudioParameterFloat> ("texture",     "Texture",     0.0f, 1.0f, 0.0f),
+          std::make_unique<juce::AudioParameterChoice>("textureMode", "Texture Mode",
+              juce::StringArray{"Silk", "Dust", "Rust"}, 0),
+          std::make_unique<juce::AudioParameterFloat> ("air",         "Air",         0.0f, 1.0f, 0.0f),
+          std::make_unique<juce::AudioParameterBool>  ("trustMode",   "Trust Mode",  true),
+          std::make_unique<juce::AudioParameterChoice>("profile",     "Profile",
               juce::StringArray{"Auto", "Vocal", "Instrument", "Master", "Ambient"}, 0)
       })
 {
@@ -138,7 +140,6 @@ bool SpatialReactorAudioProcessor::isBusesLayoutSupported (const BusesLayout& la
 
 void SpatialReactorAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer&)
 {
-    CRASH_LOG ("processBlock called");
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
@@ -152,11 +153,13 @@ void SpatialReactorAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
         return;
 
     // ---- Parameters ----
-    float amount    = apvts.getRawParameterValue("amount")->load();
-    float density   = apvts.getRawParameterValue("density")->load();
-    float texture   = apvts.getRawParameterValue("texture")->load();
-    trustMode       = apvts.getRawParameterValue("trustMode")->load() > 0.5f;
-    int profileMode = (int)apvts.getRawParameterValue("profile")->load(); // 0=Auto
+    float amount      = apvts.getRawParameterValue("amount")->load();
+    float density     = apvts.getRawParameterValue("density")->load();
+    float textureMix  = apvts.getRawParameterValue("texture")->load();
+    int   textureMode = (int)apvts.getRawParameterValue("textureMode")->load();
+    float airDirect   = apvts.getRawParameterValue("air")->load();
+    trustMode         = apvts.getRawParameterValue("trustMode")->load() > 0.5f;
+    int profileMode   = (int)apvts.getRawParameterValue("profile")->load(); // 0=Auto
 
     // 1. M/S conversion
     msMatrix.process(buffer);
@@ -165,7 +168,7 @@ void SpatialReactorAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     if (profileMode == 0)
         currentProfile = sourceClassifier.classify(buffer);
     else
-        currentProfile = profileMode - 1; // shift: 1->0(Vocal), 2->1(Instrument)...
+        currentProfile = profileMode - 1;
 
     // 3. Update macro curves
     macroMapper.update(amount, currentProfile, trustMode);
@@ -174,10 +177,13 @@ void SpatialReactorAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     int activeBands = juce::jlimit(1, 4, static_cast<int>(density * 4.0f) + 1);
     hybridDecorrelator.process(buffer, macroMapper.getWidthTarget(), activeBands);
 
-    // 5. Presence Engine
-    textureEngine.setMode(texture);
-    textureEngine.process(buffer);          // works on Side only
-    airEngine.process(buffer, macroMapper.getAirTarget());
+    // 5. Presence Engine — texture mode from discrete selector, depth from knob + macro
+    float textureDepth = juce::jlimit(0.0f, 1.0f, textureMix + macroMapper.getTextureTarget());
+    textureEngine.setMode(textureMode);
+    textureEngine.process(buffer, textureDepth);
+
+    float airAmount = juce::jlimit(0.0f, 1.0f, airDirect + macroMapper.getAirTarget());
+    airEngine.process(buffer, airAmount);
 
     // 6. Center Lock (optional)
     if (centerLockEnabled)
@@ -185,6 +191,24 @@ void SpatialReactorAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
 
     // 7. Correlation governor
     correlationGovernor.process(buffer, trustMode);
+
+    // 7b. Compute correlation for GUI meter
+    {
+        auto* mid  = buffer.getReadPointer (0);
+        auto* side = buffer.getReadPointer (1);
+        int n = buffer.getNumSamples();
+        float sumMM = 0.f, sumSS = 0.f;
+        for (int i = 0; i < n; ++i)
+        {
+            sumMM += mid[i] * mid[i];
+            sumSS += side[i] * side[i];
+        }
+        float rms_m = std::sqrt (sumMM / (float) n);
+        float rms_s = std::sqrt (sumSS / (float) n);
+        float corr = (rms_m > 1e-8f) ? 1.0f - (rms_s / rms_m) : 1.0f;
+        float prev = correlationValue.load (std::memory_order_relaxed);
+        correlationValue.store (prev + 0.08f * (corr - prev), std::memory_order_relaxed);
+    }
 
     // 8. Back to L/R
     msMatrix.inverse(buffer);

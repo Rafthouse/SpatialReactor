@@ -3,58 +3,56 @@
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_dsp/juce_dsp.h>
 
-/**
-    Hybrid decorrelator combining modulated all-pass filters and micro-spectral
-    modulation across up to 4 frequency bands.
-
-    Operates only on the Side channel to create spatial width without phasiness.
-*/
 class HybridDecorrelator
 {
 public:
     void prepare(double sampleRate, int /*samplesPerBlock*/)
     {
         for (auto& ap : allPassFilters)
-            ap.prepare(sampleRate);
+            ap.prepare();
 
         for (auto& lfo : lfoPhases)
             lfo = 0.0f;
 
-        lfoRate = 0.1f;
         fs = sampleRate;
     }
 
     void process(juce::AudioBuffer<float>& buffer,
                  float width,
-                 int   /*activeBands*/)
+                 int   activeBands)
     {
         if (width <= 0.0f)
             return;
-
-        // FIX: self-defense against mono buffer
         if (buffer.getNumChannels() < 2)
             return;
 
+        auto* mid  = buffer.getReadPointer(0);
         auto* side = buffer.getWritePointer(1);
         auto numSamples = buffer.getNumSamples();
 
+        int bands = juce::jlimit(1, 4, activeBands);
+
         for (int i = 0; i < numSamples; ++i)
         {
-            float mod = std::sin(lfoPhases[0]) * width * 0.3f;
-            side[i] = allPassFilters[0].process(side[i], mod);
-            lfoPhases[0] += juce::MathConstants<float>::twoPi * lfoRate / (float)fs;
-            if (lfoPhases[0] > juce::MathConstants<float>::twoPi)
-                lfoPhases[0] -= juce::MathConstants<float>::twoPi;
+            float decorrelated = mid[i];
+            for (int b = 0; b < bands; ++b)
+            {
+                float lfoRate = 0.08f + b * 0.07f;
+                float mod = std::sin(lfoPhases[b]) * 0.35f;
+                decorrelated = allPassFilters[b].process(decorrelated, mod);
+                lfoPhases[b] += juce::MathConstants<float>::twoPi * lfoRate / (float) fs;
+                if (lfoPhases[b] > juce::MathConstants<float>::twoPi)
+                    lfoPhases[b] -= juce::MathConstants<float>::twoPi;
+            }
+
+            side[i] += decorrelated * width;
         }
     }
 
 private:
     struct ModulatedAllPass
     {
-        void prepare(double /*sampleRate*/)
-        {
-            z = 0.0f;
-        }
+        void prepare() { z = 0.0f; }
 
         float process(float input, float modulation)
         {
@@ -70,6 +68,5 @@ private:
 
     std::array<ModulatedAllPass, 4> allPassFilters;
     std::array<float, 4> lfoPhases{};
-    float lfoRate = 0.1f;
     double fs = 44100.0;
 };

@@ -83,6 +83,22 @@ target_sources(SpatialReactor
         Source/widgets/BauhausCorrelationBar.cpp
         Source/widgets/BauhausSafeFreeToggle.h
         Source/widgets/BauhausSafeFreeToggle.cpp
+        Source/GUI/GuiTheme.h
+        Source/GUI/GuiLayout.h
+        Source/GUI/SpatialRotaryKnob.h
+        Source/GUI/SpatialRotaryKnob.cpp
+        Source/GUI/SegmentedSelector.h
+        Source/GUI/SegmentedSelector.cpp
+        Source/GUI/TrustToggle.h
+        Source/GUI/TrustToggle.cpp
+        Source/GUI/CorrelationMeter.h
+        Source/GUI/CorrelationMeter.cpp
+        Source/GUI/ReactorCoreComponent.h
+        Source/GUI/ReactorCoreComponent.cpp
+        Source/GUI/ReadoutStrip.h
+        Source/GUI/ReadoutStrip.cpp
+        Source/GUI/FaceplateComponent.h
+        Source/GUI/FaceplateComponent.cpp
 )
 
 # --- Binary resources (fonts, images) ---
@@ -288,6 +304,69 @@ target_link_libraries(SpatialReactor_CertTest
     PRIVATE
         juce::juce_audio_processors
         juce::juce_audio_basics
+        juce::juce_dsp
+        juce::juce_events
+        juce::juce_core
+)
+
+# ============================================================
+# Audio Check Test (verifies DSP changes audio)
+# ============================================================
+juce_add_console_app(SpatialReactor_AudioCheck
+    PRODUCT_NAME "SpatialReactor AudioCheck"
+    COMPANY_NAME "Shchur Audio"
+    VERSION      1.0.0
+)
+
+target_sources(SpatialReactor_AudioCheck
+    PRIVATE
+        Source/PluginProcessor.cpp
+        Source/PluginProcessor.h
+        Source/PluginEditor.cpp
+        Source/PluginEditor.h
+        Source/dsp/MSMatrix.h
+        Source/dsp/SourceClassifier.h
+        Source/dsp/HybridDecorrelator.h
+        Source/dsp/TextureEngine.h
+        Source/dsp/AirEngine.h
+        Source/dsp/CorrelationGovernor.h
+        Source/dsp/CenterLock.h
+        Source/dsp/MacroMapper.h
+        Source/widgets/BauhausButtonGroup.h
+        Source/widgets/BauhausButtonGroup.cpp
+        Source/widgets/BauhausRotaryKnob.h
+        Source/widgets/BauhausRotaryKnob.cpp
+        Source/widgets/BauhausCorrelationBar.h
+        Source/widgets/BauhausCorrelationBar.cpp
+        Source/widgets/BauhausSafeFreeToggle.h
+        Source/widgets/BauhausSafeFreeToggle.cpp
+        tests/audio_check.cpp
+)
+
+target_compile_definitions(SpatialReactor_AudioCheck
+    PRIVATE
+        JucePlugin_Name="Spatial Reactor"
+        JucePlugin_IsMidiEffect=0
+        JucePlugin_WantsMidiInput=0
+        JucePlugin_ProducesMidiOutput=0
+        JucePlugin_IsSynth=0
+        JucePlugin_ManufacturerCode=0x53686972
+        JucePlugin_PluginCode=0x53705265
+        JUCE_STANDALONE_APPLICATION=1
+        JucePlugin_PreferredChannelConfigurations
+)
+
+target_include_directories(SpatialReactor_AudioCheck
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source
+)
+
+target_link_libraries(SpatialReactor_AudioCheck
+    PRIVATE
+        juce::juce_audio_processors
+        juce::juce_audio_basics
+        juce::juce_gui_basics
+        juce::juce_graphics
         juce::juce_dsp
         juce::juce_events
         juce::juce_core
