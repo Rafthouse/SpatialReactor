@@ -9,9 +9,12 @@
 
 ---
 
-## ⚡ Встановлення
+## ⬇️ Скачати
 
-Скачай останню версію з [Releases](https://github.com/Rafthouse/SpatialReactor/releases) або збери з вихідного коду:
+► [**Spatial Reactor v1.0.0 (VST3, x64)**](https://github.com/Rafthouse/SpatialReactor/releases/download/v1.0.0/SpatialReactor_v1.0.0.zip)
+
+Розпакуйте, папку `Spatial Reactor.vst3` скопіюйте в:
+`C:\Users\%USERNAME%\AppData\Local\Programs\Common\VST3\`
 
 ```bash
 # 1. Клонуй репозиторій з JUCE
