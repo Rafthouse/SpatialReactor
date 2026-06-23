@@ -67,6 +67,22 @@ target_sources(SpatialReactor
         Source/PluginProcessor.h
         Source/PluginEditor.cpp
         Source/PluginEditor.h
+        # New DSP architecture
+        Source/dsp/EnergyPreservingMS.h
+        Source/dsp/DCBlocker.h
+        Source/dsp/StereoAnalyzer.h
+        Source/dsp/NewSourceClassifier.h
+        Source/dsp/ComplementarySpatialGenerator.h
+        Source/dsp/NewTextureEngine.h
+        Source/dsp/NewAirEngine.h
+        Source/dsp/EnergyBudgetMixer.h
+        Source/dsp/NewCenterLock.h
+        Source/dsp/NewCorrelationGovernor.h
+        Source/dsp/LoudnessCompensator.h
+        Source/dsp/ChannelBalanceGuard.h
+        Source/dsp/TruePeakLimiter.h
+        Source/dsp/MacroMapper.h
+        # Legacy DSP (kept for reference, not used)
         Source/dsp/MSMatrix.h
         Source/dsp/SourceClassifier.h
         Source/dsp/HybridDecorrelator.h
@@ -74,7 +90,7 @@ target_sources(SpatialReactor
         Source/dsp/AirEngine.h
         Source/dsp/CorrelationGovernor.h
         Source/dsp/CenterLock.h
-        Source/dsp/MacroMapper.h
+        # Widgets (legacy, kept for test targets)
         Source/widgets/BauhausButtonGroup.h
         Source/widgets/BauhausButtonGroup.cpp
         Source/widgets/BauhausRotaryKnob.h
@@ -83,6 +99,7 @@ target_sources(SpatialReactor
         Source/widgets/BauhausCorrelationBar.cpp
         Source/widgets/BauhausSafeFreeToggle.h
         Source/widgets/BauhausSafeFreeToggle.cpp
+        # GUI v6
         Source/GUI/GuiTheme.h
         Source/GUI/GuiLayout.h
         Source/GUI/SpatialRotaryKnob.h
@@ -366,6 +383,144 @@ target_link_libraries(SpatialReactor_AudioCheck
         juce::juce_audio_processors
         juce::juce_audio_basics
         juce::juce_gui_basics
+        juce::juce_graphics
+        juce::juce_dsp
+        juce::juce_events
+        juce::juce_core
+)
+
+# ============================================================
+# Baseline Measurement Tests (Phase 1 audit)
+# ============================================================
+juce_add_console_app(SpatialReactor_Baseline
+    PRODUCT_NAME "SpatialReactor Baseline"
+    COMPANY_NAME "Shchur Audio"
+    VERSION      1.0.0
+)
+
+target_sources(SpatialReactor_Baseline
+    PRIVATE
+        Source/PluginProcessor.cpp
+        Source/PluginProcessor.h
+        Source/PluginEditor.cpp
+        Source/PluginEditor.h
+        Source/dsp/EnergyPreservingMS.h
+        Source/dsp/DCBlocker.h
+        Source/dsp/StereoAnalyzer.h
+        Source/dsp/NewSourceClassifier.h
+        Source/dsp/ComplementarySpatialGenerator.h
+        Source/dsp/NewTextureEngine.h
+        Source/dsp/NewAirEngine.h
+        Source/dsp/EnergyBudgetMixer.h
+        Source/dsp/NewCenterLock.h
+        Source/dsp/NewCorrelationGovernor.h
+        Source/dsp/LoudnessCompensator.h
+        Source/dsp/ChannelBalanceGuard.h
+        Source/dsp/TruePeakLimiter.h
+        Source/dsp/MacroMapper.h
+        Source/dsp/MSMatrix.h
+        Source/dsp/SourceClassifier.h
+        Source/dsp/HybridDecorrelator.h
+        Source/dsp/TextureEngine.h
+        Source/dsp/AirEngine.h
+        Source/dsp/CorrelationGovernor.h
+        Source/dsp/CenterLock.h
+        Source/widgets/BauhausButtonGroup.h
+        Source/widgets/BauhausButtonGroup.cpp
+        Source/widgets/BauhausRotaryKnob.h
+        Source/widgets/BauhausRotaryKnob.cpp
+        Source/widgets/BauhausCorrelationBar.h
+        Source/widgets/BauhausCorrelationBar.cpp
+        Source/widgets/BauhausSafeFreeToggle.h
+        Source/widgets/BauhausSafeFreeToggle.cpp
+        Source/GUI/GuiTheme.h
+        Source/GUI/GuiLayout.h
+        Source/GUI/SpatialRotaryKnob.h
+        Source/GUI/SpatialRotaryKnob.cpp
+        Source/GUI/SegmentedSelector.h
+        Source/GUI/SegmentedSelector.cpp
+        Source/GUI/TrustToggle.h
+        Source/GUI/TrustToggle.cpp
+        Source/GUI/CorrelationMeter.h
+        Source/GUI/CorrelationMeter.cpp
+        Source/GUI/ReactorCoreComponent.h
+        Source/GUI/ReactorCoreComponent.cpp
+        Source/GUI/ReadoutStrip.h
+        Source/GUI/ReadoutStrip.cpp
+        Source/GUI/FaceplateComponent.h
+        Source/GUI/FaceplateComponent.cpp
+        Tests/Baseline/BaselineTests.cpp
+)
+
+target_compile_definitions(SpatialReactor_Baseline
+    PRIVATE
+        JucePlugin_Name="Spatial Reactor"
+        JucePlugin_IsMidiEffect=0
+        JucePlugin_WantsMidiInput=0
+        JucePlugin_ProducesMidiOutput=0
+        JucePlugin_IsSynth=0
+        JucePlugin_ManufacturerCode=0x53686972
+        JucePlugin_PluginCode=0x53705265
+        JUCE_STANDALONE_APPLICATION=1
+        JucePlugin_PreferredChannelConfigurations
+)
+
+target_include_directories(SpatialReactor_Baseline
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source
+)
+
+target_link_libraries(SpatialReactor_Baseline
+    PRIVATE
+        SpatialReactor_Resources
+        juce::juce_audio_processors
+        juce::juce_audio_basics
+        juce::juce_gui_basics
+        juce::juce_graphics
+        juce::juce_dsp
+        juce::juce_events
+        juce::juce_core
+)
+
+# ============================================================
+# Debug trace (stage-by-stage DSP diagnosis)
+# ============================================================
+juce_add_console_app(SpatialReactor_DebugTrace
+    PRODUCT_NAME "SpatialReactor DebugTrace"
+    COMPANY_NAME "Shchur Audio"
+    VERSION      1.0.0
+)
+
+target_sources(SpatialReactor_DebugTrace
+    PRIVATE
+        Tests/Baseline/DebugTrace.cpp
+        Source/dsp/EnergyPreservingMS.h
+        Source/dsp/DCBlocker.h
+        Source/dsp/ComplementarySpatialGenerator.h
+        Source/dsp/NewTextureEngine.h
+        Source/dsp/NewAirEngine.h
+        Source/dsp/EnergyBudgetMixer.h
+        Source/dsp/NewCenterLock.h
+        Source/dsp/NewCorrelationGovernor.h
+        Source/dsp/LoudnessCompensator.h
+        Source/dsp/ChannelBalanceGuard.h
+        Source/dsp/TruePeakLimiter.h
+        Source/dsp/MacroMapper.h
+)
+
+target_compile_definitions(SpatialReactor_DebugTrace
+    PRIVATE
+        JUCE_STANDALONE_APPLICATION=1
+)
+
+target_include_directories(SpatialReactor_DebugTrace
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/Source
+)
+
+target_link_libraries(SpatialReactor_DebugTrace
+    PRIVATE
+        juce::juce_audio_basics
         juce::juce_graphics
         juce::juce_dsp
         juce::juce_events
