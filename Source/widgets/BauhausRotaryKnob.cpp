@@ -178,7 +178,7 @@ void BauhausRotaryKnob::paint (juce::Graphics& g)
     }
 }
 
-void BauhausRotaryKnob::resized() { setSize (getWidth(), knobSize + 36); }
+void BauhausRotaryKnob::resized() {}
 
 void BauhausRotaryKnob::mouseDown (const juce::MouseEvent& e)
 {

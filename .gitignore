@@ -28,9 +28,7 @@ Makefile
 # JUCE
 JUCE/
 
-# Source assets (fonts too large for git)
-Source/assets/*.ttf
-Source/assets/*.svg
+# Source assets — tracked (required for BinaryData generation in CI)
 
 # Temp
 *.log

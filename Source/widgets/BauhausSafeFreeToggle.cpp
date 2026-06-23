@@ -115,5 +115,4 @@ void BauhausSafeFreeToggle::paint (juce::Graphics& g)
 
 void BauhausSafeFreeToggle::resized()
 {
-    setSize (getWidth(), 34);
 }

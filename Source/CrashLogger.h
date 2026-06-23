@@ -1,13 +1,11 @@
 #pragma once
 
 #include <juce_core/juce_core.h>
-#include <windows.h>
 
-/**
-    Dual-mode crash logger:
-    1. OutputDebugString → visible in DebugView real-time
-    2. FileLogger → persistent log file
-*/
+#ifdef _WIN32
+ #include <windows.h>
+#endif
+
 class CrashLogger
 {
 public:
@@ -19,10 +17,10 @@ public:
 
     void log (const juce::String& msg)
     {
-        // Real-time: visible in DebugView immediately
+       #ifdef _WIN32
         OutputDebugStringA (("[SpatialReactor] " + msg + "\n").toRawUTF8());
+       #endif
 
-        // Persistent: written to file
         if (writer != nullptr)
             writer->logMessage (msg);
     }
@@ -34,8 +32,9 @@ private:
                            .getChildFile ("SpatialReactor_crash.log");
         logFile.deleteFile();
         writer = std::make_unique<juce::FileLogger> (logFile, "SpatialReactor");
-        // Also write to DebugView immediately
+       #ifdef _WIN32
         OutputDebugStringA ("[SpatialReactor] CrashLogger initialized\n");
+       #endif
     }
 
     std::unique_ptr<juce::FileLogger> writer;

@@ -16,14 +16,12 @@ public:
             return;
         }
 
-        // Initialise from parameter
         auto norm = param->getValue();
         auto range = param->getNormalisableRange();
         auto raw = range.convertFrom0to1 (norm);
         int idx = juce::roundToInt (raw);
         group.setSelectedIndex (idx, juce::dontSendNotification);
 
-        // Listen for changes
         group.onChange = [this] (int index)
         {
             auto range = param->getNormalisableRange();
@@ -31,7 +29,6 @@ public:
             param->setValueNotifyingHost (norm);
         };
 
-        // Listen for external parameter changes
         param->addListener (this);
     }
 
@@ -42,12 +39,11 @@ public:
             param->removeListener (this);
     }
 
-    void parameterValueChanged (int /*paramIndex*/, float newValue) override
+    void parameterValueChanged (int, float newValue) override
     {
         auto range = param->getNormalisableRange();
         auto raw = range.convertFrom0to1 (newValue);
         int idx = juce::roundToInt (raw);
-        // Capture group reference directly — outlives Pimpl
         juce::MessageManager::callAsync ([&group = groupRef, idx]()
         {
             group.setSelectedIndex (idx, juce::dontSendNotification);
@@ -90,7 +86,6 @@ void BauhausButtonGroup::init (const juce::String& label,
     groupLabel = label;
     items = newItems;
     selectedIndex = juce::jlimit (0, items.size() - 1, defaultIndex);
-    resized();
     repaint();
 }
 
@@ -122,62 +117,45 @@ void BauhausButtonGroup::mouseDown (const juce::MouseEvent& e)
 juce::Rectangle<int> BauhausButtonGroup::getItemBounds (int index) const
 {
     auto area = getLocalBounds();
-    // Reserve top for group label
-    area.removeFromTop (14);
+    int numItems = items.size();
+    if (numItems == 0) return {};
 
-    auto itemHeight = ledGap;
-    auto y = area.getY() + index * itemHeight;
-    return { 0, y, getWidth(), itemHeight };
+    int itemWidth = area.getWidth() / numItems;
+    return { area.getX() + index * itemWidth, area.getY(), itemWidth, area.getHeight() };
 }
 
 void BauhausButtonGroup::paint (juce::Graphics& g)
 {
-    auto area = getLocalBounds();
+    auto area = getLocalBounds().toFloat();
 
-    // Group label
-    if (groupLabel.isNotEmpty())
+    // Background track
+    g.setColour (juce::Colour (0xff2C2E31));
+    g.fillRoundedRectangle (area, 4.0f);
+    g.setColour (juce::Colour (0xffA8ADB3).withAlpha (0.2f));
+    g.drawRoundedRectangle (area, 4.0f, 1.0f);
+
+    int numItems = items.size();
+    if (numItems == 0) return;
+
+    // Active segment highlight
+    float segW = area.getWidth() / (float) numItems;
+    auto activeRect = area.withWidth (segW).withX (area.getX() + selectedIndex * segW);
+    g.setColour (juce::Colour (0xff2D6BFF));
+    g.fillRoundedRectangle (activeRect.reduced (2.0f, 2.0f), 3.0f);
+
+    // Labels
+    for (int i = 0; i < numItems; ++i)
     {
-        g.setColour (juce::Colour (0x3FE8E6E3)); // 25% white
-        g.setFont (juce::Font (7.0f, juce::Font::bold));
-        g.drawText (groupLabel, area.removeFromTop (12), juce::Justification::centredLeft);
-    }
-
-    // Items
-    for (int i = 0; i < items.size(); ++i)
-    {
-        auto r = getItemBounds (i);
-
-        // LED circle
-        auto ledBounds = r.removeFromLeft (ledSize + 4).withSizeKeepingCentre (ledSize, ledSize);
-
+        auto segRect = area.withWidth (segW).withX (area.getX() + i * segW);
         bool isActive = (i == selectedIndex);
-        bool isHover  = (i == hoveredIndex);
 
-        // Outer ring
-        g.setColour (juce::Colour (0xffA8ADB3).withAlpha (isActive ? 1.0f : 0.3f));
-        g.drawEllipse (ledBounds.toFloat(), 1.5f);
-
-        // Inner fill
-        if (isActive)
-        {
-            g.setColour (juce::Colour (0xff2D6BFF));
-            g.fillEllipse (ledBounds.reduced (3).toFloat());
-        }
-        else if (isHover)
-        {
-            g.setColour (juce::Colour (0xff2D6BFF).withAlpha (0.15f));
-            g.fillEllipse (ledBounds.reduced (3).toFloat());
-        }
-
-        // Label text
-        g.setColour (isActive ? juce::Colour (0xffE8E6E3) : juce::Colour (0x59E8E6E3));
+        g.setColour (isActive ? juce::Colours::white : juce::Colour (0x99E8E6E3));
         g.setFont (juce::Font (10.0f, juce::Font::bold));
-        g.drawText (items[i].label, r, juce::Justification::centredLeft);
+        g.drawText (items[i].label, segRect.toNearestInt(), juce::Justification::centred, false);
     }
 }
 
 void BauhausButtonGroup::resized()
 {
-    int totalHeight = 14 + items.size() * ledGap;
-    setSize (getWidth(), totalHeight);
+    // Horizontal layout — respect parent's setBounds, don't override
 }

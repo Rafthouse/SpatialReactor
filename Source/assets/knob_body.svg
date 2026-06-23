@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <radialGradient id="bodyGrad" cx="50%" cy="45%" r="50%">
+      <stop offset="0%"   stop-color="#3a3c40"/>
+      <stop offset="60%"  stop-color="#2C2E31"/>
+      <stop offset="100%" stop-color="#1e1f22"/>
+    </radialGradient>
+    <radialGradient id="innerGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#2a2c2f"/>
+      <stop offset="100%" stop-color="#2C2E31"/>
+    </radialGradient>
+  </defs>
+  <!-- Outer ring -->
+  <circle cx="100" cy="100" r="94" fill="none" stroke="#A8ADB3" stroke-width="4"/>
+  <!-- Body -->
+  <circle cx="100" cy="100" r="90" fill="url(#bodyGrad)"/>
+  <!-- Inner subtle ring -->
+  <circle cx="100" cy="100" r="66" fill="none" stroke="#A8ADB3" stroke-opacity="0.12" stroke-width="1.5"/>
+  <!-- Center dot hint -->
+  <circle cx="100" cy="100" r="4" fill="#A8ADB3" fill-opacity="0.1"/>
+  <!-- Indicator dot at 12 o'clock -->
+  <circle cx="100" cy="36" r="4" fill="#2D6BFF"/>
+</svg>

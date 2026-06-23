@@ -86,5 +86,4 @@ void BauhausCorrelationBar::paint (juce::Graphics& g)
 
 void BauhausCorrelationBar::resized()
 {
-    setSize (getWidth(), 42);
 }
