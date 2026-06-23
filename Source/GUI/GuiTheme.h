@@ -25,11 +25,11 @@ namespace SR
     {
         static inline juce::Font sans (float size, int style = juce::Font::plain)
         {
-            return juce::Font ("Segoe UI", size, style);
+            return juce::Font (juce::FontOptions ("Segoe UI", size, style));
         }
         static inline juce::Font mono (float size, int style = juce::Font::plain)
         {
-            return juce::Font ("Consolas", size, style);
+            return juce::Font (juce::FontOptions ("Consolas", size, style));
         }
     }
 }
